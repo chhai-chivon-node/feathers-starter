@@ -1,11 +1,11 @@
 
-var express = require('express'),
+var feathers = require('feathers'),
 	mongoose = require('mongoose'),
 	bodyParser = require('body-parser'),
 	cookieParser = require('cookie-parser'),
     methodOverride = require('method-override'),
 	cors = require('cors'),
-	app = express();
+	app = feathers();
 
 // ENVIRONMENT CONFIG
 var env = process.env.NODE_ENV = process.env.NODE_ENV || 'development',
@@ -13,14 +13,17 @@ var env = process.env.NODE_ENV = process.env.NODE_ENV || 'development',
 
 mongoose.connect(envConfig.db);
 
-// EXPRESS CONFIG
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
-app.use(methodOverride());
-app.use(cookieParser());
-app.use(express.static(__dirname + '/public'));
-
+// FEATHERS CONFIG
+app.use(bodyParser.json())
+	.use(cors())
+	.use(methodOverride())
+	.use(cookieParser())
+	.use(feathers.static(__dirname + '/public'))
+	.configure(feathers.socketio()) // Enable Socket.io
+	.configure(feathers.rest()) // Enable REST services
+	.use(bodyParser.json()) // Turn on JSON parser for REST services
+	.use(bodyParser.urlencoded({ extended: true })); // Turn on URL-encoded parser for REST services
+	
 // ROUTES
 require('./server/routes')(app);
 

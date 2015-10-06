@@ -1,16 +1,18 @@
-var express = require('express'),
+var feathers = require('feathers'),
 	path = require('path'),
 	rootPath = path.normalize(__dirname + '/../'),
-	apiRouter = express.Router(),
-	router = express.Router();
+	router = feathers.Router(),
+	mongooseService = require('feathers-mongoose'),
+	Todo = require('./models/todo');
 
 module.exports = function(app){	
+
+	app.use('api/todos', new mongooseService('Todo', Todo));
 
 	// angularjs catch all route
 	router.get('/*', function(req, res) {
 		res.sendFile(rootPath + 'public/index.html', { user: req.user });
 	});
 
-	app.use('/api', apiRouter);	// haven't built any api yet
 	app.use('/', router);
 };
